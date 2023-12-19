@@ -2,13 +2,6 @@
 	import Node from "$lib/components/Node.svelte"
 </script>
 
-<div class="canvas h-full absolute p-10 box-border flex overflow-x-auto">
-	{#each { length: 1 } as _}
-		<Node text="helo world" depth={0} />
-	{/each}
+<div class="canvas h-full absolute p-10 box-border overflow-x-auto">
+	<Node text="Top node" depth={0} />
 </div>
-
-<style lang="stylus">
-	.canvas
-		background #111
-</style>

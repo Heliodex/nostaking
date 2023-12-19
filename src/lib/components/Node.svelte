@@ -40,8 +40,8 @@
 			{@const { x: nx, y: ny, width: nw } = path.node}
 			<path
 				d="M {px + pw / 2} {py + ph}
-				L {px + pw / 2} {py + 80}
-				L {nx + nw / 2} {py + 80}
+				L {px + pw / 2} {py + 58}
+				L {nx + nw / 2} {py + 58}
 				L {nx + nw / 2} {ny}"
 				stroke="#aaa"
 				stroke-width="2"
@@ -50,25 +50,28 @@
 	{/each}
 </svg>
 
-<span class="px-2.5">
+{#snippet nextNodes()}
+	<span class="children flex pt-5 gap-2.5">
+		{#each { length: Math[depth < 2 ? "ceil" : "floor"](Math.random() * 3) } as _}
+			<svelte:self
+				depth={depth + 1}
+				text="first"
+				parentNode={node}
+				addPath={addChildPath} />
+		{/each}
+	</span>
+{/snippet}
+
+<span>
 	<div
 		class="bg-black p-2 rounded-2 w-30 mx-a border-gray border-1
 		border-solid text-center"
 		bind:this={node}>
 		{text}
 	</div>
-	<div class="children flex pt-20">
-		{#if depth < 5}
-			<svelte:self
-				depth={depth + 1}
-				text="first"
-				parentNode={node}
-				addPath={addChildPath} />
-			<svelte:self
-				depth={depth + 1}
-				text="second"
-				parentNode={node}
-				addPath={addChildPath} />
+	<div class="pt-5">
+		{#if depth < 9}
+			{@render nextNodes()}
 		{/if}
 	</div>
 </span>
