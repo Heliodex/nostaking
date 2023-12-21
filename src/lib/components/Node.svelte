@@ -1,77 +1,57 @@
 <script lang="ts">
-	const { text, depth, parentNode, children, addPath } = $props<{
+	type Child = {
 		text: string
-		depth: number
-		parentNode?: HTMLDivElement
-		children?: () => any
-		addPath?: (path: any) => void
-	}>()
+		children?: Child[]
+	}
+
+	let { text, children, parentNode, addNode, recomputePaths } = $props<
+		Child & {
+			parentNode?: HTMLDivElement
+			addNode: (path: {
+				parent: HTMLDivElement
+				node: HTMLDivElement
+			}) => number
+			recomputePaths: () => void
+		}
+	>()
 
 	let node: HTMLDivElement | undefined = $state()
+	let added = false
 
-	if (addPath) {
-		let added = false
+	$effect(() => {
+		if (parentNode && node && !added) {
+			addNode({
+				parent: parentNode,
+				node: node,
+			})
+			added = true
+		}
+	})
 
-		$effect(() => {
-			if (parentNode && node && !added) {
-				addPath({
-					parent: parentNode.getBoundingClientRect(),
-					node: node.getBoundingClientRect(),
-				})
-				added = true
-			}
-		})
-	}
-
-	type Path = {
-		parent: DOMRect
-		node: DOMRect
-	}
-
-	const paths: Path[] = $state([]),
-		addChildPath = (path: Path) => paths.push(path)
+	$effect(() => {
+		console.log("recomputing paths 2")
+		if (text) recomputePaths()
+	})
 </script>
-
-<svg id="lineToAboveNode" class="absolute top-0 left-0 w-full h-full z-1">
-	<!-- go  -->
-	{#each paths as path}
-		{#if path.parent && path.node}
-			{@const { x: px, y: py, width: pw, height: ph } = path.parent}
-			{@const { x: nx, y: ny, width: nw } = path.node}
-			<path
-				d="M {px + pw / 2} {py + ph}
-				L {px + pw / 2} {py + 58}
-				L {nx + nw / 2} {py + 58}
-				L {nx + nw / 2} {ny}"
-				stroke="#aaa"
-				stroke-width="2"
-				fill="none" />
-		{/if}
-	{/each}
-</svg>
-
-{#snippet nextNodes()}
-	<span class="children flex pt-5 gap-2.5">
-		{#each { length: Math[depth < 2 ? "ceil" : "floor"](Math.random() * 3) } as _}
-			<svelte:self
-				depth={depth + 1}
-				text="first"
-				parentNode={node}
-				addPath={addChildPath} />
-		{/each}
-	</span>
-{/snippet}
 
 <span>
 	<div
-		class="bg-black p-2 rounded-2 w-30 mx-a border-gray border-1
-		border-solid text-center"
-		bind:this={node}>
+		class="bg-black p-2 rounded-2 w-25 mx-a
+	border-gray border-1 border-solid text-center"
+		bind:this={node}
+		role="button"
+		tabindex="0">
 		{text}
 	</div>
-	<div class="pt-5">
-		{#if depth < 9}
-			{@render nextNodes()}
-		{/if}
-	</div>
+	{#if (children || []).length > 0}
+		<span class="children flex pt-10 gap-2.5">
+			{#each children || [] as child}
+				<svelte:self
+					{...child}
+					parentNode={node}
+					{addNode}
+					{recomputePaths} />
+			{/each}
+		</span>
+	{/if}
 </span>
