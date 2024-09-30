@@ -1,49 +1,57 @@
 <script lang="ts">
 	import Node from "$lib/components/Node.svelte"
+	import { id, type Child, type Path } from "$lib/child"
 	import { untrack } from "svelte"
 
-	const map = {
-		text: "top node\n\n",
-
+	const map: Child = {
+		text: "top node",
+		id: id(),
 		children: [
 			{
-				text: "first\n\n",
+				text: "first",
+				id: id(),
 				children: [
 					{
 						text: "first",
-					},
-				],
+						id: id()
+					}
+				]
 			},
 			{
 				text: "second",
+				id: id(),
 				children: [
 					{
 						text: "first",
+						id: id(),
+						children: [
+							{
+								text: "third lv1",
+								id: id()
+							},
+							{
+								text: "third lv2",
+								id: id()
+							}
+						]
 					},
 					{
 						text: "second",
-					},
-				],
+						id: id()
+					}
+				]
 			},
 			{
 				text: "third",
-			},
-		],
+				id: id()
+			}
+		]
 	}
 
-	type NodeType = {
-		parent: HTMLDivElement
-		node: HTMLDivElement
-	}
-	type Path = {
-		parent: DOMRect
-		node: DOMRect
-	}
-
-	let nodes: NodeType[] = $state([])
+	let nodes: Path[] = $state([])
 	let paths: Path[] = $state([])
 
-	const addNode = (node: NodeType) => nodes.push(node)
+	const addNode = (n: Path) => nodes.push(n)
 
 	function recomputePaths() {
 		console.log("recomputing paths")
@@ -53,23 +61,22 @@
 		let scrollY = window.scrollY
 
 		untrack(() => {
-			for (const node of nodes) {
-				const parentRect = node.parent.getBoundingClientRect()
-				const nodeRect = node.node.getBoundingClientRect()
-				paths.push({
-					parent: new DOMRect(
-						parentRect.x + scrollX,
-						parentRect.y + scrollY,
-						parentRect.width,
-						parentRect.height,
-					),
-					node: new DOMRect(
-						nodeRect.x + scrollX,
-						nodeRect.y + scrollY,
-						nodeRect.width,
-						nodeRect.height,
-					),
-				})
+			for (const n of nodes) {
+				const pr = n.parent
+				const nr = n.node
+				const parent = new DOMRect(
+					pr.x + scrollX,
+					pr.y + scrollY,
+					pr.width,
+					pr.height
+				)
+				const node = new DOMRect(
+					nr.x + scrollX,
+					nr.y + scrollY,
+					nr.width,
+					nr.height
+				)
+				paths.push({ parent, node })
 			}
 		})
 	}
