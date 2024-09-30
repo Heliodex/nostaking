@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Node from "./Node.svelte"
+
 	type Child = {
 		text: string
 		children?: Child[]
@@ -22,7 +24,7 @@
 		if (parentNode && node && !added) {
 			addNode({
 				parent: parentNode,
-				node: node,
+				node: node
 			})
 			added = true
 		}
@@ -46,11 +48,7 @@
 	{#if (children || []).length > 0}
 		<span class="children flex pt-10 gap-2.5">
 			{#each children || [] as child}
-				<svelte:self
-					{...child}
-					parentNode={node}
-					{addNode}
-					{recomputePaths} />
+				<Node {...child} parentNode={node} {addNode} {recomputePaths} />
 			{/each}
 		</span>
 	{/if}

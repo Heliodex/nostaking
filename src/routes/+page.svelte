@@ -31,7 +31,7 @@
 		],
 	}
 
-	type Node = {
+	type NodeType = {
 		parent: HTMLDivElement
 		node: HTMLDivElement
 	}
@@ -40,10 +40,10 @@
 		node: DOMRect
 	}
 
-	let nodes: Node[] = $state([])
+	let nodes: NodeType[] = $state([])
 	let paths: Path[] = $state([])
 
-	const addNode = (node: Node) => nodes.push(node)
+	const addNode = (node: NodeType) => nodes.push(node)
 
 	function recomputePaths() {
 		console.log("recomputing paths")

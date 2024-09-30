@@ -1,5 +1,5 @@
 <script lang="ts">
-	import "/src/global.styl"
+	import "/src/global.css"
 	import "uno.css"
 </script>
 
