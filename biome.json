@@ -20,6 +20,9 @@
 	"overrides": [
 		{
 			"include": ["*.svelte"],
+			"formatter": {
+				"enabled": false
+			},
 			"linter": {
 				"rules": {
 					"style": {

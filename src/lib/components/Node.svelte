@@ -1,50 +1,34 @@
 <script lang="ts">
 	import Node from "./Node.svelte"
-	import type { Child, Path } from "$lib/child"
+	import type { Child } from "$lib/child.svelte"
+	import { onMount } from "svelte"
 
-	type NodeType = Child & {
-		parentNode?: HTMLDivElement
-		addNode: (path: Path) => number
-		recomputePaths: () => void
-		parent?: NodeType
+	type Props = {
+		child: Child
 	}
-	// Do whatcha gotta do, grarrrr
-	let {
-		text,
-		id,
-		children,
-		parentNode,
-		addNode,
-		recomputePaths,
-		parent
-	}: NodeType = $props()
+	let { child }: Props = $props()
 
 	function leftSibling() {
-		const children = parent?.children
+		const children = child.siblings
 		if (!children) return
 
-		const s = children.findIndex(c => c.id === id) - 1
+		const s = children.findIndex(c => c.id === child.id) - 1
 		return s >= 0 ? children[s] : undefined
 	}
 
-	const getDepthBelow = (c: { children?: Child[] }): number =>
-		Math.max(...(c.children?.map(getDepthBelow) || [0])) + 1
-
-	let sibling = leftSibling()
-	if (sibling) console.log(getDepthBelow(sibling), sibling.text)
+	// We can collapse nodes together if they're not the same depth
+	function depthPadding() {
+		const sibling = leftSibling()
+		if (sibling && sibling.depthBelow !== child.depthBelow) return sibling
+	}
+	// console.log(depthPadding())
 
 	let domNode = $state<HTMLDivElement | undefined>()
-	let added = false
 
-	$effect(() => {
-		if (!parentNode || !domNode || added) return
-		addNode({
-			parent: parentNode.getBoundingClientRect(),
-			node: domNode.getBoundingClientRect()
-		})
-		added = true
+	onMount(() => {
+		if (!child.parent?.rect || !domNode) return
+		child.rect = domNode.getBoundingClientRect()
 	})
-	$effect(recomputePaths)
 </script>
 
 <span class="bg-neutral/20 h-full">
@@ -53,25 +37,12 @@
 		bind:this={domNode}
 		role="button"
 		tabindex="0">
-		{text}
+		{child.text}
 	</div>
-	{#if children}
+	{#if child.children}
 		<span class="flex pt-10 gap-2.5">
-			{#each children as child}
-				<Node
-					{...child}
-					parent={{
-						text,
-						id,
-						children,
-						parentNode,
-						addNode,
-						recomputePaths,
-						parent
-					}}
-					parentNode={domNode}
-					{addNode}
-					{recomputePaths} />
+			{#each child.children as grandchild}
+				<Node child={grandchild} />
 			{/each}
 		</span>
 	{/if}
