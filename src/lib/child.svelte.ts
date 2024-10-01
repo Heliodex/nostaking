@@ -3,14 +3,20 @@ export class Child {
 	id: string = ""
 	children: Child[] = []
 	parent?: Child
-	rect: DOMRect = $state(new DOMRect())
+	shiftedLeft = $state(0)
+	x = $state(0)
+	y = $state(0)
+	width = $state(0)
+	height = $state(0)
 
 	get siblings() {
 		return this.parent?.children || []
 	}
 
 	get depthBelow(): number {
-		return Math.max(...(this.children?.map(c => c.depthBelow) || [0])) + 1
+		return this.children.length > 0
+			? Math.max(...(this.children?.map(c => c.depthBelow) || [0])) + 1
+			: 1
 	}
 
 	get descendants(): Child[] {
@@ -24,4 +30,3 @@ export class Child {
 		this.children = children
 	}
 }
-
