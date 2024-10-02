@@ -9,26 +9,23 @@
 	let { child }: Props = $props()
 
 	// We can collapse nodes together if they're not the same depth
-	function depthPadding(): number | void {
+	function depthPadding(): number | undefined {
 		const { siblings } = child
 		if (!siblings) return
 
 		const currentI = siblings.findIndex(c => c.id === child.id)
 		const sibling = siblings[currentI - 1]
-		if (!sibling || sibling.depthBelow === child.depthBelow) return
-
-		let totalShiftLeft = 0
-		for (let s = 0; s < currentI; s++)
-			totalShiftLeft += siblings[s].shiftedLeft
-
-		let parent = child.parent
-		while (parent) {
-			totalShiftLeft += parent.shiftedLeft
-			parent = child.parent
+		if (!sibling) return
+		if (sibling.depthBelow === child.depthBelow) {
+			for (const d of child.descendants) {
+				d.shiftedLeft += sibling.shiftedLeft
+				d.x -= sibling.shiftedLeft
+			}
+			return -sibling.shiftedLeft
 		}
 
 		// calculate how much we can move the current node to the left
-		const diff = child.x - sibling.x - 192 + totalShiftLeft
+		const diff = 0
 
 		for (const d of child.descendants) {
 			d.shiftedLeft += diff
@@ -38,17 +35,20 @@
 		return -diff
 	}
 
-	let pad = $state()
+	let pad: number | undefined = $state()
+	let totalNode = $state<HTMLLIElement | undefined>()
 	let domNode = $state<HTMLDivElement | undefined>()
 
 	onMount(() => {
 		const rect = domNode?.getBoundingClientRect()
-		if (!rect) return
+		const totalRect = totalNode?.getBoundingClientRect()
+		if (!rect || !totalRect) return
 
 		child.x = rect.x
 		child.y = rect.y
 		child.width = rect.width
 		child.height = rect.height
+		child.totalWidth = totalRect.width
 
 		untrack(() => {
 			pad = depthPadding()
@@ -58,14 +58,19 @@
 
 <li
 	class="flex flex-col items-center"
-	style={pad ? `translate: ${pad}px` : null}>
+	style={pad ? `translate: ${pad}px` : null}
+	bind:this={totalNode}>
 	<div
 		class="bg-black p-2 rounded-2 w-25 border-gray border-1 border-solid text-center"
 		bind:this={domNode}
 		role="button"
 		tabindex="0">
 		{child.text}
-		{pad}
+		<!-- {#if pad}
+			<span class="text-green">
+				{Math.round(pad)}
+			</span>
+		{/if} -->
 	</div>
 	{#if child.children}
 		<ul class="flex gap-2.5 p-0 pt-10">

@@ -8,6 +8,7 @@ export class Child {
 	y = $state(0)
 	width = $state(0)
 	height = $state(0)
+	totalWidth = $state(0)
 
 	get siblings() {
 		return this.parent?.children || []
