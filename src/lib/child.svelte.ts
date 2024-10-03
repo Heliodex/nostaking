@@ -3,25 +3,45 @@ export class Child {
 	id: string = ""
 	children: Child[] = []
 	parent?: Child
-	shiftedLeft = $state(0)
-	x = $state(0)
-	y = $state(0)
-	width = $state(0)
-	height = $state(0)
-	totalWidth = $state(0)
+	status: "none" | "highlighted" | "selected" = $state("none")
 
 	get siblings() {
 		return this.parent?.children || []
 	}
 
-	get depthBelow(): number {
-		return this.children.length > 0
-			? Math.max(...(this.children?.map(c => c.depthBelow) || [0])) + 1
-			: 1
+	get layers() {
+		const layers: Child[][] = [
+			[this], // top layer of the tree
+		]
+		let layer = layers[0]
+		while (layer.length > 0) {
+			const nextLayer: Child[] = []
+			for (const child of layer) nextLayer.push(...child.children)
+			if (nextLayer.length > 0) layers.push(nextLayer)
+			layer = nextLayer
+		}
+
+		return layers
 	}
 
-	get descendants(): Child[] {
-		return [this, ...this.children.flatMap(c => c.descendants)]
+	setTreeStatus(status: typeof this.status) {
+		let parent = this as Child
+		while (parent?.parent) parent = parent.parent
+
+		parent.status = status
+		parent.setSubtreeStatus(status)
+	}
+
+	setAncestorStatus(status: typeof this.status) {
+		let parent = this as Child
+		while (parent?.parent) {
+			parent = parent.parent
+			parent.status = status
+		}
+	}
+	setSubtreeStatus(status: typeof this.status) {
+		for (const layer of this.layers)
+			for (const child of layer) if (child !== this) child.status = status
 	}
 
 	constructor(text: string, ...children: Child[]) {

@@ -3,3 +3,9 @@ body {
 	background: black;
 	color: white;
 }
+
+button {
+	font-size: inherit;
+	font-family: inherit;
+	cursor: pointer;
+}
