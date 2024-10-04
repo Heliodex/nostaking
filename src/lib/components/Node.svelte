@@ -3,8 +3,10 @@
 
 	type Props = {
 		child: Child
+		scrollTo: (top: number) => void
+		column: HTMLDivElement
 	}
-	let { child }: Props = $props()
+	let { child, scrollTo, column }: Props = $props()
 
 	function statusClass() {
 		const s = child.status
@@ -16,7 +18,11 @@
 	let button = $state<HTMLButtonElement>()
 
 	child.scrollTo = () => {
-		button?.scrollIntoView({ block: "center" })
+		if (!button) return
+		// find position of button in parent
+		const parentRect = column.getBoundingClientRect()
+		const buttonRect = button.getBoundingClientRect()
+		scrollTo( parentRect.top - buttonRect.top)
 	}
 </script>
 
