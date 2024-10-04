@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Node from "$lib/components/Node.svelte"
 	import { Child } from "$lib/child.svelte"
+	import { onMount } from "svelte"
 
 	const child = new Child(
 		"top node",
@@ -18,15 +19,21 @@
 		new Child("third")
 	)
 
+	onMount(() => {
+		child.select()
+	})
+
 	const layers = child.layers
 </script>
 
 <div class="h-screen flex box-border py-4 px-2">
 	{#each layers as layer}
-		<div class="px-2 flex flex-col gap-4 w-35">
+		<div class="px-2 flex flex-col gap-4 w-35 overflow-y-scroll">
+			<div class="padding min-h-90vh"></div>
 			{#each layer as child}
 				<Node {child} />
 			{/each}
+			<div class="padding min-h-90vh"></div>
 		</div>
 	{/each}
 </div>

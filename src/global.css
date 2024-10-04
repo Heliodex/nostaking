@@ -9,3 +9,25 @@ button {
 	font-family: inherit;
 	cursor: pointer;
 }
+
+/* ::-webkit-scrollbar {
+	width: 0.6rem;
+	height: 0.6rem;
+	position: absolute;
+	z-index: 1;
+	cursor: grab;
+}
+::-webkit-scrollbar-thumb {
+	border-radius: 1rem;
+	background: #333;
+	&:hover {
+		background: #555;
+	}
+	&:active {
+		background: #444;
+	}
+} */
+
+::-webkit-scrollbar {
+	display: none;
+}

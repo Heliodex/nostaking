@@ -5,21 +5,27 @@
 		child: Child
 	}
 	let { child }: Props = $props()
+
+	function statusClass() {
+		const s = child.status
+		if (s === "none") return "opacity-33"
+		if (s === "highlighted") return "opacity-66"
+		return ""
+	}
+
+	let button = $state<HTMLButtonElement>()
+
+	child.scrollTo = () => {
+		button?.scrollIntoView({ block: "center" })
+	}
 </script>
 
 <button
-	class="p-2 px-3 rounded-2 border-0 text-left"
-	class:opacity-50={child.status === "none"}
-	class:opacity-75={child.status === "highlighted"}
+	class="p-2 px-3 rounded-2 border-0 text-left {statusClass()} transition-opacity duration-300"
+	bind:this={button}
 	onclick={() => {
-		if (child.status === "selected") {
-			child.setTreeStatus("none")
-		} else {
-			child.setTreeStatus("none")
-			child.status = "selected"
-			child.setSubtreeStatus("highlighted")
-			child.setAncestorStatus("highlighted")
-		}
+		if (child.status === "selected") child.setTreeStatus("none")
+		else child.select()
 	}}>
 	{child.text}
 	<br />
