@@ -16,7 +16,6 @@
 	})
 
 	function scrollTo(top: number) {
-		console.log("scrolling to", top)
 		$smoothTopPos = top + window.innerHeight / 2.5
 	}
 </script>

@@ -22,18 +22,23 @@
 		// find position of button in parent
 		const parentRect = column.getBoundingClientRect()
 		const buttonRect = button.getBoundingClientRect()
-		scrollTo( parentRect.top - buttonRect.top)
+		scrollTo(parentRect.top - buttonRect.top)
 	}
 </script>
 
-<button
-	class="p-2 px-3 rounded-2 border-0 text-left {statusClass()} transition-opacity duration-300"
-	bind:this={button}
-	onclick={() => {
-		if (child.status === "selected") child.setTreeStatus("none")
-		else child.select()
-	}}>
-	{child.text}
-	<br />
-	{child.status}
-</button>
+{#if child.modifying}
+	<button
+		class="p-2 px-3 rounded-2 border-0 text-left {statusClass()} transition-opacity duration-300">
+		{child.text}
+	</button>
+{:else}
+	<button
+		class="p-2 px-3 rounded-2 border-0 text-left {statusClass()} transition-opacity duration-300"
+		bind:this={button}
+		onclick={() => {
+			if (child.status === "selected") child.modifying = true
+			else child.select()
+		}}>
+		{child.text}
+	</button>
+{/if}

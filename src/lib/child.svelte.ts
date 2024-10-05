@@ -4,6 +4,7 @@ export class Child {
 	children: Child[] = []
 	parent?: Child
 	status: "none" | "highlighted" | "selected" = $state("none")
+	modifying = $state(false)
 	scrollTo = () => {}
 
 	get siblings() {
@@ -49,6 +50,10 @@ export class Child {
 		for (const l of this.layers)
 			for (const c of l) if (c !== this) c.status = status
 	}
+	setSiblingStatus(status: typeof this.status) {
+		for (const s of this.siblings) if (s !== this) s.status = status
+	}
+
 	scrollToTree() {
 		for (const a of this.ancestors) a.scrollTo()
 		this.scrollTo()
@@ -61,6 +66,7 @@ export class Child {
 		this.status = "selected"
 		this.setSubtreeStatus("highlighted")
 		this.setAncestorStatus("highlighted")
+		this.setSiblingStatus("highlighted")
 	}
 
 	constructor(text: string, ...children: Child[]) {
