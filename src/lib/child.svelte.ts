@@ -1,5 +1,5 @@
 export class Child {
-	text: string = ""
+	text = $state("")
 	id: string = ""
 	children: Child[] = []
 	parent?: Child

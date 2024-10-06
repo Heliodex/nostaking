@@ -16,6 +16,7 @@
 	}
 
 	let button = $state<HTMLButtonElement>()
+	let input = $state<HTMLInputElement>()
 
 	child.scrollTo = () => {
 		if (!button) return
@@ -27,17 +28,19 @@
 </script>
 
 {#if child.modifying}
-	<button
-		class="p-2 px-3 rounded-2 border-0 text-left {statusClass()} transition-opacity duration-300">
-		{child.text}
-	</button>
+	{input?.focus()}
+	<input
+		class="p-2 px-3 rounded-2 text-left {statusClass()} transition-opacity duration-300 bg-black text-white border-1 border-white"
+		bind:this={input}
+		bind:value={child.text} />
 {:else}
 	<button
 		class="p-2 px-3 rounded-2 border-0 text-left {statusClass()} transition-opacity duration-300"
 		bind:this={button}
 		onclick={() => {
-			if (child.status === "selected") child.modifying = true
-			else child.select()
+			if (child.status === "selected") {
+				child.modifying = true
+			} else child.select()
 		}}>
 		{child.text}
 	</button>

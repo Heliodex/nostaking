@@ -28,7 +28,7 @@
 
 <div class="h-screen flex box-border py-4 px-2">
 	{#each layers as layer}
-		<div class="w-35 px-2 overflow-hidden">
+		<div class="px-2 overflow-hidden">
 			<Column {layer} />
 		</div>
 	{/each}
