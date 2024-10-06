@@ -35,23 +35,24 @@ export class Child {
 		return ancestors
 	}
 
-	setTreeStatus(status: typeof this.status) {
+	applyToAncestors(fn: (n: Child) => void) {
+		for (const a of this.ancestors) fn(a)
+	}
+
+	applyToSubtree(fn: (n: Child) => void) {
+		for (const l of this.layers) for (const c of l) if (c !== this) fn(c)
+	}
+
+	applyToTree(fn: (n: Child) => void) {
 		let parent = this as Child
 		while (parent?.parent) parent = parent.parent
 
-		parent.status = status
-		parent.setSubtreeStatus(status)
+		fn(parent)
+		parent.applyToSubtree(fn)
 	}
 
-	setAncestorStatus(status: typeof this.status) {
-		for (const a of this.ancestors) a.status = status
-	}
-	setSubtreeStatus(status: typeof this.status) {
-		for (const l of this.layers)
-			for (const c of l) if (c !== this) c.status = status
-	}
-	setSiblingStatus(status: typeof this.status) {
-		for (const s of this.siblings) if (s !== this) s.status = status
+	applyToSiblings(fn: (n: Child) => void) {
+		for (const s of this.siblings) if (s !== this) fn(s)
 	}
 
 	scrollToTree() {
@@ -61,12 +62,22 @@ export class Child {
 	}
 
 	select() {
-		this.scrollToTree()
-		this.setTreeStatus("none")
+		this.applyToTree(n => {
+			n.status = "none"
+			n.modifying = false
+		})
 		this.status = "selected"
-		this.setSubtreeStatus("highlighted")
-		this.setAncestorStatus("highlighted")
-		this.setSiblingStatus("highlighted")
+
+		function highlight(n: Child) {
+			n.status = "highlighted"
+		}
+		this.applyToSubtree(highlight)
+		this.applyToAncestors(highlight)
+		this.applyToSiblings(highlight)
+
+		requestAnimationFrame(() => {
+			this.scrollToTree()
+		})
 	}
 
 	constructor(text: string, ...children: Child[]) {

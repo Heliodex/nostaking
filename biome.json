@@ -28,11 +28,7 @@
 					"style": {
 						"useConst": "off"
 					},
-					"correctness": {
-						"noUnusedLabels": "off"
-					},
 					"suspicious": {
-						"noConfusingLabels": "off",
 						"noImplicitAnyLet": "off"
 					}
 				}
