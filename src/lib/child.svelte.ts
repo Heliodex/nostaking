@@ -27,8 +27,7 @@ export class Child {
 	}
 	get currentLayer() {
 		let parent = this.parent
-		while (parent?.parent)
-			parent = parent.parent
+		while (parent?.parent) parent = parent.parent
 
 		return parent?.layers.find(l => l.includes(this))
 	}
@@ -66,7 +65,7 @@ export class Child {
 	scrollToTree() {
 		for (const a of this.ancestors) a.scrollTo()
 		this.scrollTo()
-		for (const l of this.layers) l[0].scrollTo()
+		for (const l of this.layers) l[Math.floor((l.length - 1) / 2)].scrollTo()
 	}
 
 	select() {
@@ -128,10 +127,13 @@ export class Child {
 		else otherChildren?.[0].select()
 	}
 
-	constructor(text: string, ...children: Child[]) {
+	addChild(c: Child) {
+		c.parent = this
+		this.children.push(c)
+	}
+
+	constructor(text: string) {
 		this.text = text
 		this.id = Math.random().toString(36).substring(2, 9)
-		for (const child of children) child.parent = this
-		this.children = children
 	}
 }

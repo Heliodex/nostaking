@@ -14,6 +14,11 @@
 		if (s === "highlighted") return "opacity-66"
 		return ""
 	}
+	let borderClass = $derived(
+		child.children.length > 0
+			? "border-0"
+			: "border-(3 solid neutral-400 l t b)"
+	)
 
 	let button = $state<HTMLButtonElement>()
 	let textarea = $state<HTMLParagraphElement>()
@@ -73,13 +78,15 @@
 	{textarea?.focus()}
 	{setCursorToEnd()}
 	<p
-		class="textarea p-2 px-3 rounded-2 bg-black text-white"
-		contenteditable="true"
+		class="textarea p-1 px-2 rounded-1 bg-black text-white {borderClass}"
 		bind:this={textarea}
 		bind:textContent={modifyingText}
+		contenteditable="true"
 		onblur={finish}
 		onkeypress={e => {
 			if (e.key === "Enter") finish()
+		}}
+		onkeydown={e => {
 			if (e.key === "Escape") {
 				child.modifying = false
 				modifyingText = child.text
@@ -89,12 +96,9 @@
 {:else}
 	{child.focus()}
 	<button
-		class="p-2 px-3 rounded-2 border-0 text-left {statusClass()} transition-opacity duration-300 break-words {child
-			.children.length > 0
-			? ''
-			: 'border-(6 solid neutral-500 l t b)'}"
-		tabindex="0"
+		class="p-1 px-2 rounded-1 text-left {statusClass()} transition-opacity duration-300 break-words {borderClass}"
 		bind:this={button}
+		tabindex="0"
 		onclick={() => {
 			if (child.status === "selected") {
 				modifyingText = child.text

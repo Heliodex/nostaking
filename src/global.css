@@ -3,10 +3,6 @@
 	outline: transparent;
 }
 
-:root {
-	font-size: 14px;
-}
-
 body {
 	margin: 0;
 	background: black;
@@ -21,6 +17,7 @@ button,
 .textarea {
 	font-size: inherit;
 	font-family: inherit;
+	font-size: 12px;
 }
 
 button {
