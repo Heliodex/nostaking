@@ -20,12 +20,15 @@
 </script>
 
 <div
-	class="relative flex flex-col gap-4 w-45 overflow-hidden"
+	class="relative px-1 flex flex-col gap-2 w-45 overflow-hidden"
 	style="top: {$smoothTopPos}px"
 	bind:this={column}>
-	<div class="padding min-h-45vh"></div>
-	{#each layer as child}
+	<div class="min-h-45vh"></div>
+	{#each layer as child, i}
+		{#if i > 0 && layer[i - 1].parent !== child.parent}
+			<div class="min-h-2"></div>
+		{/if}
 		<Node {child} {scrollTo} {column} />
 	{/each}
-	<div class="padding min-h-45vh"></div>
+	<div class="min-h-45vh"></div>
 </div>

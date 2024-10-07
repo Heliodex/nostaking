@@ -28,8 +28,6 @@
 
 <div class="h-screen flex box-border py-4 px-2">
 	{#each layers as layer}
-		<div class="px-2 overflow-hidden">
-			<Column {layer} />
-		</div>
+		<Column {layer} />
 	{/each}
 </div>
