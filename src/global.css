@@ -3,18 +3,34 @@
 	outline: transparent;
 }
 
+:root {
+	font-size: 14px;
+}
+
 body {
 	margin: 0;
 	background: black;
 	color: white;
 }
 
+p {
+	margin: 0;
+}
+
 button,
-input {
+.textarea {
 	font-size: inherit;
 	font-family: inherit;
 }
 
 button {
 	cursor: pointer;
+	&:focus-visible {
+		background: #cfc !important;
+	}
+}
+
+.textarea {
+	border: 1px solid white;
+	outline: transparent;
 }

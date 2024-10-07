@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Child } from "$lib/child.svelte"
 	import Node from "$lib/components/Node.svelte"
-	import { onMount } from "svelte"
 	import { spring } from "svelte/motion"
 
 	type Props = {
@@ -21,7 +20,7 @@
 </script>
 
 <div
-	class="relative flex flex-col gap-4 w-35 overflow-hidden"
+	class="relative flex flex-col gap-4 w-45 overflow-hidden"
 	style="top: {$smoothTopPos}px"
 	bind:this={column}>
 	<div class="padding min-h-45vh"></div>
