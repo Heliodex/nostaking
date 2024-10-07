@@ -3,10 +3,18 @@
 
 	type Props = {
 		child: Child
-		scrollTo: (top: number) => void
+		scrollTo: (top: number, c: Child) => void
 		column: HTMLDivElement
+		i: number
+		currentlyScrolled: Child[]
 	}
-	let { child, scrollTo, column }: Props = $props()
+	let {
+		child,
+		scrollTo,
+		column,
+		i,
+		currentlyScrolled = $bindable()
+	}: Props = $props()
 
 	function statusClass() {
 		const s = child.status
@@ -15,9 +23,7 @@
 		return ""
 	}
 	let borderClass = $derived(
-		child.children.length > 0
-			? "border-0"
-			: "border-(3 solid neutral-400 l t b)"
+		child.children.length > 0 ? "" : "border-(3 solid neutral-400 l t b)"
 	)
 
 	let button = $state<HTMLButtonElement>()
@@ -28,7 +34,7 @@
 		// find position of button in parent
 		const parentRect = column.getBoundingClientRect()
 		const buttonRect = button.getBoundingClientRect()
-		scrollTo(parentRect.top - buttonRect.top)
+		scrollTo(parentRect.top - buttonRect.top, child)
 	}
 	child.focus = () => {
 		button?.focus()
@@ -63,7 +69,7 @@
 				child.parent?.select()
 				break
 			case "ArrowRight":
-				child.selectChild()
+				currentlyScrolled[i + 1].select()
 				break
 			case "Space":
 				modifyingText = child.text
@@ -96,7 +102,7 @@
 {:else}
 	{child.focus()}
 	<button
-		class="p-1 px-2 rounded-1 text-left {statusClass()} transition-opacity duration-300 break-words {borderClass}"
+		class="p-1 px-2 rounded-1 text-left transition-opacity duration-300 break-words border-0 {statusClass()} {borderClass}"
 		bind:this={button}
 		tabindex="0"
 		onclick={() => {

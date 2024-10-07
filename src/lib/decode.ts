@@ -17,5 +17,4 @@ for (const line of lines) {
 	nodes[tabs] = newChild
 }
 
-
 export default nodes[0]

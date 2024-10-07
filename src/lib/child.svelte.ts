@@ -65,7 +65,8 @@ export class Child {
 	scrollToTree() {
 		for (const a of this.ancestors) a.scrollTo()
 		this.scrollTo()
-		for (const l of this.layers) l[Math.floor((l.length - 1) / 2)].scrollTo()
+		for (const l of this.layers)
+			l[Math.floor((l.length - 1) / 2)].scrollTo()
 	}
 
 	select() {
@@ -105,26 +106,6 @@ export class Child {
 	selectNext() {
 		const { next } = this
 		if (next) next.select()
-	}
-	selectChild() {
-		if (this.children.length > 0) {
-			this.children[0].select()
-			return
-		}
-		let other = this.next
-		let previous = false
-		if (!other) {
-			other = this.previous
-			previous = true
-		}
-		let otherChildren = other?.children
-		while (other && otherChildren?.length === 0) {
-			other = other.next
-			otherChildren = other?.children
-		}
-
-		if (previous) otherChildren?.[otherChildren.length - 1].select()
-		else otherChildren?.[0].select()
 	}
 
 	addChild(c: Child) {
