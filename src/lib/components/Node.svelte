@@ -18,12 +18,14 @@
 
 	function statusClass() {
 		const s = child.status
-		if (s === "none") return "opacity-33"
-		if (s === "highlighted") return "opacity-66"
-		return ""
+		if (s === "none") return "bg-neutral-700"
+		if (s === "highlighted") return "bg-neutral-400"
+		return "bg-white"
 	}
 	let borderClass = $derived(
-		child.children.length > 0 ? "" : "border-(3 solid neutral-400 l t b)"
+		child.children.length === 0 && i < currentlyScrolled.length - 1
+			? "border-(r-3 solid neutral-500)"
+			: ""
 	)
 
 	let button = $state<HTMLButtonElement>()
@@ -102,7 +104,7 @@
 {:else}
 	{child.focus()}
 	<button
-		class="p-1 px-2 rounded-1 text-left transition-opacity duration-300 break-words border-0 {statusClass()} {borderClass}"
+		class="p-1 px-2 rounded-1 text-left break-words border-0 {statusClass()} {borderClass}"
 		bind:this={button}
 		tabindex="0"
 		onclick={() => {

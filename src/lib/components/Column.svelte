@@ -13,8 +13,9 @@
 	let column = $state<HTMLDivElement>()
 	// transitions could be done with CSS, but it's not as smooth and doesn't gain much performance
 	let topPos = spring<number | null>(0, {
-		stiffness: 0.15,
-		damping: 1
+		// magic numbers
+		stiffness: 0.13,
+		damping: 0.48
 	})
 
 	function scrollTo(top: number, c: Child) {
