@@ -1,45 +1,38 @@
 export class Child {
 	text = $state("")
 	id: string = ""
-	children: Child[] = []
+	children: Child[] = $state([])
 	parent?: Child
 	status: "none" | "highlighted" | "selected" = $state("none")
 	modifying = $state(false)
 	scrollTo = () => {}
 	focus = () => {}
 
-	get siblings() {
-		return this.parent?.children || []
-	}
-
 	get layers(): Child[][] {
-		const layers: Child[][] = [
-			[this], // top layer of the tree
-		]
-		let layer = layers[0]
+		const layers: Child[][] = []
+		let layer: Child[] = [this] // top layer of the tree
 		while (layer.length > 0) {
-			const nextLayer: Child[] = []
-			for (const child of layer) nextLayer.push(...child.children)
-			if (nextLayer.length > 0) layers.push(nextLayer)
-			layer = nextLayer
+			layers.push(layer)
+			layer = layer.flatMap(c => c.children)
 		}
 		return layers
-	}
-	get currentLayer() {
-		let parent = this.parent
-		while (parent?.parent) parent = parent.parent
-
-		return parent?.layers.find(l => l.includes(this))
 	}
 
 	get ancestors(): Child[] {
 		const ancestors: Child[] = []
-		let parent = this.parent
-		while (parent) {
-			ancestors.push(parent)
-			parent = parent.parent
+		let p = this.parent
+		while (p) {
+			ancestors.push(p)
+			p = p.parent
 		}
 		return ancestors
+	}
+
+	// got root?
+	get root() {
+		let p = this as Child
+		while (p.parent) p = p.parent
+		return p
 	}
 
 	applyToAncestors(fn: (n: Child) => void) {
@@ -51,61 +44,44 @@ export class Child {
 	}
 
 	applyToTree(fn: (n: Child) => void) {
-		let parent = this as Child
-		while (parent?.parent) parent = parent.parent
-
-		fn(parent)
-		parent.applyToSubtree(fn)
+		const { root } = this
+		fn(root)
+		root.applyToSubtree(fn)
 	}
 
 	applyToSiblings(fn: (n: Child) => void) {
-		for (const s of this.siblings) if (s !== this) fn(s)
-	}
-
-	scrollToTree() {
-		for (const a of this.ancestors) a.scrollTo()
-		this.scrollTo()
-		for (const l of this.layers)
-			l[Math.floor((l.length - 1) / 2)].scrollTo()
+		for (const s of this.parent?.children || []) if (s !== this) fn(s)
 	}
 
 	select() {
-		this.applyToTree(n => {
+		function unHighlight(n: Child) {
 			n.status = "none"
 			n.modifying = false
-		})
-		this.status = "selected"
-
+		}
 		function highlight(n: Child) {
 			n.status = "highlighted"
 		}
+
+		const { root } = this
+		unHighlight(root)
+		root.applyToSubtree(unHighlight)
 		this.applyToSubtree(highlight)
 		this.applyToAncestors(highlight)
 		this.applyToSiblings(highlight)
+		this.status = "selected"
 
 		requestAnimationFrame(() => {
-			this.scrollToTree()
+			for (const a of this.ancestors) a.scrollTo()
+			this.scrollTo()
+			for (const l of this.layers)
+				l[Math.floor((l.length - 1) / 2)].scrollTo()
 			this.focus()
 		})
 	}
 
-	get previous(): Child | undefined {
-		const layer = this.currentLayer || []
-		const i = layer.indexOf(this)
-		if (i > 0) return layer[i - 1]
-	}
-	get next(): Child | undefined {
-		const layer = this.currentLayer || []
-		const i = layer.indexOf(this)
-		if (i < layer.length - 1) return layer[i + 1]
-	}
-	selectPrevious() {
-		const { previous } = this
-		if (previous) previous.select()
-	}
-	selectNext() {
-		const { next } = this
-		if (next) next.select()
+	selectSibling(n: number) {
+		const l = this.root.layers.find(l => l.includes(this)) || []
+		l[l.indexOf(this) + n]?.select()
 	}
 
 	addChild(c: Child) {

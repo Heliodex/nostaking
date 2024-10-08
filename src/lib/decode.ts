@@ -2,8 +2,8 @@ import { Child } from "$lib/child.svelte"
 
 const notes = await (await fetch("/notes.txt")).text()
 
-const lines = notes.split("\n")
-lines.pop() // remove the last empty line
+const l = notes.split("\n")
+const lines = l.slice(0, 15)
 
 const nodes: Child[] = []
 for (const line of lines) {

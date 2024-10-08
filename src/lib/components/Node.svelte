@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Child } from "$lib/child.svelte"
+	import { Child } from "$lib/child.svelte"
 
 	type Props = {
 		child: Child
@@ -62,10 +62,10 @@
 	function reselect(e: KeyboardEvent) {
 		switch (e.key) {
 			case "ArrowUp":
-				child.selectPrevious()
+				child.selectSibling(-1)
 				break
 			case "ArrowDown":
-				child.selectNext()
+				child.selectSibling(1)
 				break
 			case "ArrowLeft":
 				child.parent?.select()
@@ -73,9 +73,11 @@
 			case "ArrowRight":
 				currentlyScrolled[i + 1].select()
 				break
-			case "Space":
-				modifyingText = child.text
-				child.modifying = true
+			case "e":
+				console.log("new node")
+				const newChild = new Child("hi")
+				child.addChild(newChild)
+				child.select()
 				break
 			default:
 		}
@@ -107,7 +109,7 @@
 		class="p-1 px-2 rounded-1 text-left break-words border-0 {statusClass()} {borderClass}"
 		bind:this={button}
 		tabindex="0"
-		onclick={() => {
+		onclick={e => {
 			if (child.status === "selected") {
 				modifyingText = child.text
 				child.modifying = true
