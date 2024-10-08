@@ -1,14 +1,15 @@
 <script lang="ts">
-	import type { Child } from "$lib/child.svelte"
+	import { Child } from "$lib/child.svelte"
 	import Node from "$lib/components/Node.svelte"
 	import { spring } from "svelte/motion"
 
 	type Props = {
 		layer: Child[]
 		i: number
+		reselect: (c: Child) => (e: KeyboardEvent) => void
 		currentlyScrolled: Child[]
 	}
-	let { layer, i, currentlyScrolled = $bindable() }: Props = $props()
+	let { layer, i, reselect, currentlyScrolled = $bindable() }: Props = $props()
 
 	let column = $state<HTMLDivElement>()
 	// transitions could be done with CSS, but it's not as smooth and doesn't gain much performance
@@ -32,6 +33,6 @@
 		{#if j > 0 && layer[j - 1].parent !== child.parent}
 			<div class="min-h-1"></div>
 		{/if}
-		<Node {child} {i} bind:currentlyScrolled {scrollTo} {column} />
+		<Node {child} {i} reselect={reselect(child)} bind:currentlyScrolled {scrollTo} {column} />
 	{/each}
 </div>

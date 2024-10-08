@@ -18,60 +18,29 @@ export class Child {
 		return layers
 	}
 
-	get ancestors(): Child[] {
-		const ancestors: Child[] = []
-		let p = this.parent
-		while (p) {
-			ancestors.push(p)
-			p = p.parent
-		}
-		return ancestors
-	}
-
-	// got root?
-	get root() {
-		let p = this as Child
-		while (p.parent) p = p.parent
-		return p
-	}
-
-	applyToAncestors(fn: (n: Child) => void) {
-		for (const a of this.ancestors) fn(a)
-	}
-
-	applyToSubtree(fn: (n: Child) => void) {
-		for (const l of this.layers) for (const c of l) if (c !== this) fn(c)
-	}
-
-	applyToTree(fn: (n: Child) => void) {
-		const { root } = this
-		fn(root)
-		root.applyToSubtree(fn)
-	}
-
-	applyToSiblings(fn: (n: Child) => void) {
-		for (const s of this.parent?.children || []) if (s !== this) fn(s)
-	}
-
 	select() {
-		function unHighlight(n: Child) {
-			n.status = "none"
-			n.modifying = false
-		}
-		function highlight(n: Child) {
-			n.status = "highlighted"
+		const ancestors: Child[] = []
+		let p: Child = this
+		while (p.parent) {
+			p = p.parent
+			ancestors.push(p)
 		}
 
-		const { root } = this
-		unHighlight(root)
-		root.applyToSubtree(unHighlight)
-		this.applyToSubtree(highlight)
-		this.applyToAncestors(highlight)
-		this.applyToSiblings(highlight)
+		for (const l of p.layers)
+			for (const c of l) {
+				c.status = "none"
+				c.modifying = false
+			}
+		for (const c of [
+			...ancestors,
+			...(this.parent?.children.filter(c => c !== this) || []),
+			...this.layers.flat(),
+		])
+			c.status = "highlighted"
 		this.status = "selected"
 
 		requestAnimationFrame(() => {
-			for (const a of this.ancestors) a.scrollTo()
+			for (const a of ancestors) a.scrollTo()
 			this.scrollTo()
 			for (const l of this.layers)
 				l[Math.floor((l.length - 1) / 2)].scrollTo()
@@ -80,7 +49,10 @@ export class Child {
 	}
 
 	selectSibling(n: number) {
-		const l = this.root.layers.find(l => l.includes(this)) || []
+		let p: Child = this
+		while (p.parent) p = p.parent
+
+		const l = p.layers.find(l => l.includes(this)) || []
 		l[l.indexOf(this) + n]?.select()
 	}
 

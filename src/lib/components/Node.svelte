@@ -6,6 +6,7 @@
 		scrollTo: (top: number, c: Child) => void
 		column: HTMLDivElement
 		i: number
+		reselect: (e: KeyboardEvent) => void
 		currentlyScrolled: Child[]
 	}
 	let {
@@ -13,6 +14,7 @@
 		scrollTo,
 		column,
 		i,
+		reselect,
 		currentlyScrolled = $bindable()
 	}: Props = $props()
 
@@ -57,30 +59,6 @@
 		range.collapse(false)
 		selection?.removeAllRanges()
 		selection?.addRange(range)
-	}
-
-	function reselect(e: KeyboardEvent) {
-		switch (e.key) {
-			case "ArrowUp":
-				child.selectSibling(-1)
-				break
-			case "ArrowDown":
-				child.selectSibling(1)
-				break
-			case "ArrowLeft":
-				child.parent?.select()
-				break
-			case "ArrowRight":
-				currentlyScrolled[i + 1].select()
-				break
-			case "e":
-				console.log("new node")
-				const newChild = new Child("hi")
-				child.addChild(newChild)
-				child.select()
-				break
-			default:
-		}
 	}
 </script>
 
