@@ -35,19 +35,29 @@
 			case "ArrowRight":
 				currentlyScrolled[i + 1]?.select()
 				break
-			case "e":
-				console.log("new node")
-				const newC = new Child("hi")
+			case "e": {
+				const newC = new Child("")
 				c.addChild(newC)
 
-				// recompute time
 				computeLayers()
-
 				requestAnimationFrame(() => {
 					newC.select()
+					newC.modifying = true
 				})
-
 				break
+			}
+			case "s": {
+				if (!c.parent) return
+				const newC = new Child("")
+				c.parent.addChild(newC, c)
+
+				computeLayers()
+				requestAnimationFrame(() => {
+					newC.select()
+					newC.modifying = true
+				})
+				break
+			}
 			default:
 		}
 	}

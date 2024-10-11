@@ -30,25 +30,19 @@
 			: ""
 	)
 
-	let button = $state<HTMLButtonElement>()
 	let textarea = $state<HTMLParagraphElement>()
 
 	child.scrollTo = () => {
-		if (!button) return
+		if (!child.button) return
 		// find position of button in parent
 		const parentRect = column.getBoundingClientRect()
-		const buttonRect = button.getBoundingClientRect()
+		const buttonRect = child.button.getBoundingClientRect()
 		scrollTo(parentRect.top - buttonRect.top, child)
 	}
-	child.focus = () => {
-		button?.focus()
-	}
-
-	let modifyingText = $state("")
 
 	function finish() {
-		child.modifying = false
-		child.text = modifyingText
+		child.flush()
+		child.select()
 	}
 
 	function setCursorToEnd() {
@@ -68,7 +62,7 @@
 	<p
 		class="textarea p-1 px-2 rounded-1 bg-black text-white {borderClass}"
 		bind:this={textarea}
-		bind:textContent={modifyingText}
+		bind:textContent={child.modifyingText}
 		contenteditable="true"
 		onblur={finish}
 		onkeypress={e => {
@@ -77,20 +71,19 @@
 		onkeydown={e => {
 			if (e.key === "Escape") {
 				child.modifying = false
-				modifyingText = child.text
+				child.modifyingText = ""
 			}
 		}}>
 	</p>
 {:else}
-	{child.focus()}
 	<button
 		class="p-1 px-2 rounded-1 text-left break-words border-0 {statusClass()} {borderClass}"
-		bind:this={button}
+		bind:this={child.button}
 		tabindex="0"
 		onclick={e => {
 			if (child.status === "selected") {
-				modifyingText = child.text
 				child.modifying = true
+				child.modifyingText = child.text
 			} else child.select()
 		}}
 		onkeydown={reselect}>

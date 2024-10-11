@@ -1,12 +1,13 @@
 export class Child {
 	text = $state("")
+	modifyingText = $state("")
 	id: string = ""
 	children: Child[] = $state([])
 	parent?: Child
 	status: "none" | "highlighted" | "selected" = $state("none")
 	modifying = $state(false)
 	scrollTo = () => {}
-	focus = () => {}
+	button = $state<HTMLButtonElement>()
 
 	get layers(): Child[][] {
 		const layers: Child[][] = []
@@ -16,6 +17,14 @@ export class Child {
 			layer = layer.flatMap(c => c.children)
 		}
 		return layers
+	}
+
+	flush() {
+		this.text = this.modifyingText
+		this.modifying = false
+		requestAnimationFrame(() => {
+			this.modifyingText = ""
+		})
 	}
 
 	select() {
@@ -44,7 +53,7 @@ export class Child {
 			this.scrollTo()
 			for (const l of this.layers)
 				l[Math.floor((l.length - 1) / 2)].scrollTo()
-			this.focus()
+			this.button?.focus()
 		})
 	}
 
@@ -56,9 +65,12 @@ export class Child {
 		l[l.indexOf(this) + n]?.select()
 	}
 
-	addChild(c: Child) {
+	addChild(c: Child, after?: Child) {
 		c.parent = this
-		this.children.push(c)
+		if (after) {
+			if (after.parent !== this) return
+			this.children.splice(this.children.indexOf(after) + 1, 0, c)
+		} else this.children.push(c)
 	}
 
 	constructor(text: string) {
