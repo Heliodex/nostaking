@@ -8,13 +8,14 @@ const lines = l.slice(0, 15)
 const nodes: Child[] = []
 for (const line of lines) {
 	// each line begins with a number of tabs
-	const tabs = line.match(/^\t*/)?.[0].length || 0
+	const layer = line.match(/^\t*/)?.[0].length
+	if (layer === undefined) continue
 
-	const parent = nodes[tabs - 1]
+	const parent = nodes[layer - 1]
 	const text = line.trim()
-	const newChild = new Child(text)
+	const newChild = new Child(text, layer - 1)
 	parent?.addChild(newChild)
-	nodes[tabs] = newChild
+	nodes[layer] = newChild
 }
 
 export default nodes[0]

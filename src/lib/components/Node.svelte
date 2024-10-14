@@ -3,20 +3,10 @@
 
 	type Props = {
 		child: Child
-		scrollTo: (top: number, c: Child) => void
-		column: HTMLDivElement
-		i: number
 		reselect: (e: KeyboardEvent) => void
 		currentlyScrolled: Child[]
 	}
-	let {
-		child,
-		scrollTo,
-		column,
-		i,
-		reselect,
-		currentlyScrolled = $bindable()
-	}: Props = $props()
+	let { child, reselect, currentlyScrolled = $bindable() }: Props = $props()
 
 	function statusClass(): string {
 		const s = child.status
@@ -25,20 +15,13 @@
 		return "bg-white"
 	}
 	let borderClass = $derived(
-		child.children.length === 0 && i < currentlyScrolled.length - 1
+		child.children.length === 0 &&
+			child.layer < currentlyScrolled.length - 1
 			? "border-(r-3 solid neutral-500)"
 			: ""
 	)
 
 	let textarea = $state<HTMLParagraphElement>()
-
-	child.scrollTo = (): void => {
-		if (!child.button) return
-		// find position of button in parent
-		const parentRect = column.getBoundingClientRect()
-		const buttonRect = child.button.getBoundingClientRect()
-		scrollTo(parentRect.top - buttonRect.top, child)
-	}
 
 	function finish(): void {
 		child.flush()
@@ -55,6 +38,8 @@
 		selection?.addRange(range)
 	}
 </script>
+
+{console.log(child)}
 
 {#if child.modifying}
 	{textarea?.focus()}
@@ -80,7 +65,7 @@
 		class="p-1 px-2 rounded-1 text-left break-words border-0 {statusClass()} {borderClass}"
 		bind:this={child.button}
 		tabindex="0"
-		onclick={e => {
+		onclick={() => {
 			if (child.status === "selected") {
 				child.modifying = true
 				child.modifyingText = child.text

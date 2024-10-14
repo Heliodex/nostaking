@@ -7,10 +7,11 @@
 	let layers: Child[][] = $state([])
 
 	function computeLayers(): void {
-		layers = [[child]]
-		for (let i = 0; layers[i]?.length > 0; i++)
-			layers.push(layers[i].flatMap(c => c.children))
-		layers.pop()
+		const newLayers = [[child]]
+		for (let i = 0; newLayers[i]?.length > 0; i++)
+			newLayers.push(newLayers[i].flatMap(c => c.children))
+		newLayers.pop()
+		layers = newLayers
 	}
 
 	onMount(() => {
@@ -39,7 +40,7 @@
 					currentlyScrolled[i + 1]?.select()
 					break
 				case "e": {
-					const newC = new Child("")
+					const newC = new Child("", c.layer + 1)
 					c.addChild(newC)
 
 					computeLayers()
@@ -51,7 +52,7 @@
 				}
 				case "s": {
 					if (!c.parent) return
-					const newC = new Child("")
+					const newC = new Child("", c.layer)
 					c.parent.addChild(newC, c)
 
 					computeLayers()
@@ -67,7 +68,7 @@
 </script>
 
 <div class="h-screen flex box-border py-4 px-2 overflow-y-hidden">
-	{#each layers as layer, i}
-		<Column {layer} {i} reselect={reselect(i)} bind:currentlyScrolled />
+	{#each layers as _, i}
+		<Column bind:layers {i} reselect={reselect(i)} bind:currentlyScrolled />
 	{/each}
 </div>

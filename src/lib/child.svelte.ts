@@ -6,8 +6,16 @@ export class Child {
 	parent?: Child
 	status: "none" | "highlighted" | "selected" = $state("none")
 	modifying = $state(false)
-	scrollTo = (): void => {}
+	layer: number
 	button = $state<HTMLButtonElement>()
+	columnScrollTo = (_top: number, _c: this): void => {}
+
+	scrollTo(): void {
+		// find position of button in parent
+		const parentRect = this.column.column.getBoundingClientRect()
+		const buttonRect = this.button.getBoundingClientRect()
+		this.columnScrollTo(parentRect.top - buttonRect.top, this)
+	}
 
 	get layers(): Child[][] {
 		const layers: Child[][] = []
@@ -73,8 +81,9 @@ export class Child {
 		} else this.children.push(c)
 	}
 
-	constructor(text: string) {
+	constructor(text: typeof this.text, layer: typeof this.layer) {
 		this.text = text
+		this.layer = layer
 		this.id = Math.random().toString(36).substring(2, 9)
 	}
 }
