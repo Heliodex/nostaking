@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Child } from "$lib/child.svelte"
+	import type { Child } from "$lib/child.svelte"
 
 	type Props = {
 		child: Child
@@ -18,7 +18,7 @@
 		currentlyScrolled = $bindable()
 	}: Props = $props()
 
-	function statusClass() {
+	function statusClass(): string {
 		const s = child.status
 		if (s === "none") return "bg-neutral-700"
 		if (s === "highlighted") return "bg-neutral-400"
@@ -32,7 +32,7 @@
 
 	let textarea = $state<HTMLParagraphElement>()
 
-	child.scrollTo = () => {
+	child.scrollTo = (): void => {
 		if (!child.button) return
 		// find position of button in parent
 		const parentRect = column.getBoundingClientRect()
@@ -40,12 +40,12 @@
 		scrollTo(parentRect.top - buttonRect.top, child)
 	}
 
-	function finish() {
+	function finish(): void {
 		child.flush()
 		child.select()
 	}
 
-	function setCursorToEnd() {
+	function setCursorToEnd(): void {
 		if (!textarea) return
 		const range = document.createRange()
 		const selection = window.getSelection()

@@ -1,12 +1,12 @@
 export class Child {
 	text = $state("")
 	modifyingText = $state("")
-	id: string = ""
+	id = ""
 	children: Child[] = $state([])
 	parent?: Child
 	status: "none" | "highlighted" | "selected" = $state("none")
 	modifying = $state(false)
-	scrollTo = () => {}
+	scrollTo = (): void => {}
 	button = $state<HTMLButtonElement>()
 
 	get layers(): Child[][] {
@@ -19,7 +19,7 @@ export class Child {
 		return layers
 	}
 
-	flush() {
+	flush(): void {
 		this.text = this.modifyingText
 		this.modifying = false
 		requestAnimationFrame(() => {
@@ -27,7 +27,7 @@ export class Child {
 		})
 	}
 
-	select() {
+	select(): void {
 		const ancestors: Child[] = []
 		let p: Child = this
 		while (p.parent) {
@@ -57,7 +57,7 @@ export class Child {
 		})
 	}
 
-	selectSibling(n: number) {
+	selectSibling(n: number): void {
 		let p: Child = this
 		while (p.parent) p = p.parent
 
@@ -65,7 +65,7 @@ export class Child {
 		l[l.indexOf(this) + n]?.select()
 	}
 
-	addChild(c: Child, after?: Child) {
+	addChild(c: Child, after?: Child): void {
 		c.parent = this
 		if (after) {
 			if (after.parent !== this) return
