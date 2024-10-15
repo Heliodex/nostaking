@@ -13,7 +13,7 @@ for (const line of lines) {
 
 	const parent = nodes[layer - 1]
 	const text = line.trim()
-	const newChild = new Child(text, layer - 1)
+	const newChild = new Child(text, layer)
 	parent?.addChild(newChild)
 	nodes[layer] = newChild
 }

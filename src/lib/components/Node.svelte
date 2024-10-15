@@ -39,8 +39,6 @@
 	}
 </script>
 
-{console.log(child)}
-
 {#if child.modifying}
 	{textarea?.focus()}
 	{setCursorToEnd()}

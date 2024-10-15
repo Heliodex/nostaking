@@ -1,3 +1,16 @@
+export class Column {
+	nodes: Child[] = $state([])
+	column = $state<HTMLDivElement>()
+
+	constructor(nodes: Child[]) {
+		this.nodes = nodes
+	}
+}
+
+export const layers = new (class {
+	l = $state<Column[]>([])
+})()
+
 export class Child {
 	text = $state("")
 	modifyingText = $state("")
@@ -10,9 +23,15 @@ export class Child {
 	button = $state<HTMLButtonElement>()
 	columnScrollTo = (_top: number, _c: this): void => {}
 
+	get column(): HTMLDivElement {
+		const col = layers.l[this.layer].column
+		if (!col) throw new Error("column not found")
+		return col
+	}
+
 	scrollTo(): void {
 		// find position of button in parent
-		const parentRect = this.column.column.getBoundingClientRect()
+		const parentRect = this.column.getBoundingClientRect()
 		const buttonRect = this.button.getBoundingClientRect()
 		this.columnScrollTo(parentRect.top - buttonRect.top, this)
 	}
@@ -65,20 +84,23 @@ export class Child {
 		})
 	}
 
-	selectSibling(n: number): void {
-		let p: Child = this
-		while (p.parent) p = p.parent
-
-		const l = p.layers.find(l => l.includes(this)) || []
-		l[l.indexOf(this) + n]?.select()
-	}
-
 	addChild(c: Child, after?: Child): void {
 		c.parent = this
-		if (after) {
-			if (after.parent !== this) return
-			this.children.splice(this.children.indexOf(after) + 1, 0, c)
-		} else this.children.push(c)
+		if (!after) {
+			this.children.push(c)
+			if (layers.l.length > 0) {
+				const { nodes } = layers.l[c.layer]
+				nodes.push(c)
+			}
+			return
+		}
+		if (after.parent !== this) return
+
+		this.children.splice(this.children.indexOf(after) + 1, 0, c)
+		if (layers.l.length > 0) {
+			const { nodes } = layers.l[c.layer]
+			nodes.splice(nodes.indexOf(after) + 1, 0, c)
+		}
 	}
 
 	constructor(text: typeof this.text, layer: typeof this.layer) {
