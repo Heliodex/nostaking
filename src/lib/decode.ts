@@ -3,7 +3,7 @@ import { Child } from "$lib/child.svelte"
 const notes = await (await fetch("/notes.txt")).text()
 
 const l = notes.split("\n")
-const lines = l.slice(0, 15)
+const lines = l
 
 const nodes: Child[] = []
 for (const line of lines) {
